@@ -1,0 +1,29 @@
+name: Send Daily AI Content Email
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Runs every day at 8:00 UTC
+  workflow_dispatch:      # Allows manual trigger
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run script
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          RSS_FEED_URL: ${{ secrets.RSS_FEED_URL }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          TO_EMAIL: ${{ secrets.TO_EMAIL }}
+        run: python generate_and_queue.py
